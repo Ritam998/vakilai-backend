@@ -7,16 +7,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from loguru import logger
-import sys
-import os
 from dotenv import load_dotenv
-
 load_dotenv()
 
 
-from backend.app.api.core.config import settings
-from backend.app.api.routes import auth, documents
-from backend.app.api.middleware.logging_middleware import loggingMiddleware
+from app.api.core.config import settings
+from app.api.routes import auth, documents
+from app.api.middleware.logging_middleware import loggingMiddleware
 logger.remove()
 logger.add(sys.stdout, format="{time:HH:mm:ss} | {level} | {message}", level="DEBUG", colorize=True)
 

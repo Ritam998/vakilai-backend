@@ -5,9 +5,9 @@ from datetime import datetime
 from typing import List
 from loguru import logger
 
-from app.core.config import settings
-from app.models.schemas import AnalysisResult, DocumentType, SupportedLanguage
-from app.services.classifier_service import ClassifierService
+from app.api.core.config import settings
+from app.api.models.schemas import AnalysisResult, DocumentType, SupportedLanguage
+from app.api.services.classifier_service import ClassifierService
 
 TEMPLATES = {
     DocumentType.RENT_AGREEMENT: {

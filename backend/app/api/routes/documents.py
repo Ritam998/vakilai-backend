@@ -2,15 +2,15 @@ import uuid
 from datetime import datetime
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
 from loguru import logger
-from app.core.config import settings
-from app.core.security import get_current_user
-from app.models.schemas import (
+from app.api.core.config import settings
+from app.api.models.security import get_current_user
+from app.api.models.schemas import (
     AnalysisResult, DocumentHistoryResponse,
     DocumentHistoryItem, UsageResponse, SupportedLanguage,
 )
-from app.services.pdf_service import PDFService, PDFExtractionError
-from app.services.classifier_service import ClassifierService
-from app.services.explanation_service import ExplanationService
+from app.api.services.pdf_service import PDFService, PDFExtractionError
+from app.api.services.classifier_service import ClassifierService
+from app.api.services.explanation_service import ExplanationService
 
 
 router = APIRouter(prefix="/documents", tags=["Documents"])

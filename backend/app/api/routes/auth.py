@@ -2,13 +2,13 @@ import uuid
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends
 from loguru import logger
-from app.core.config import settings
-from app.core.security import (
+from app.api.core.config import settings
+from app.api.models.security import (
     hash_password, verify_password,
     create_access_token, create_refresh_token,
     decode_token, get_current_user,
 )
-from app.models.schemas import (
+from app.api.models.schemas import (
     SignupRequest, LoginRequest, TokenResponse,
     RefreshRequest, UserResponse, MessageResponse,
 )
