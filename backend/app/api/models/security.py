@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
-from jwt.exceptions import InvalidTokenError as JWTError
+from jose.exceptions import JWTError
 from passlib.context import CryptContext
 from app.api.core.config import settings
 

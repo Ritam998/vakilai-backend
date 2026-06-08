@@ -1,0 +1,77 @@
+# ===========================
+# Environment Variables
+# ===========================
+.env
+.env.*
+**/.env
+**/.env.*
+*.env
+
+# ===========================
+# Python
+# ===========================
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+.Python
+
+# ===========================
+# Virtual Environment
+# ===========================
+venv/
+.venv/
+env/
+ENV/
+backend/venv/
+
+# ===========================
+# Distribution / Packaging
+# ===========================
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+wheels/
+
+# ===========================
+# Testing
+# ===========================
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# ===========================
+# VS Code
+# ===========================
+.vscode/
+*.code-workspace
+
+# ===========================
+# Logs
+# ===========================
+*.log
+logs/
+
+# ===========================
+# OS Files
+# ===========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===========================
+# Jupyter Notebooks
+# ===========================
+.ipynb_checkpoints/
+*.ipynb
+
+# ===========================
+# Node (if any frontend)
+# ===========================
+node_modules/
+.next/

@@ -4,7 +4,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from loguru import logger
 
 
-class LoggingMiddleware(BaseHTTPMiddleware):
+class loggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         start = time.time()
         logger.info(f"-> {request.method} {request.url.path}")

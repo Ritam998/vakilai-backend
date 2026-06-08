@@ -1,7 +1,7 @@
 import re
 from typing import Dict, Tuple
 from loguru import logger
-from app.models.schemas import DocumentType
+from app.api.models.schemas import DocumentType
 
 KEYWORD_RULES: Dict[DocumentType, list] = {
     DocumentType.RENT_AGREEMENT: [
