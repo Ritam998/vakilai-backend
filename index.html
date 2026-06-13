@@ -696,6 +696,7 @@ const FETCH_OPTIONS = {
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <script>
@@ -1607,7 +1608,223 @@ async function startAnalysis() {
   }
 
   function downloadResult() {
-    alert('PDF download will be connected to your backend. The result content is ready to print.');
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      const gold   = [201, 168, 76];
+      const white  = [244, 239, 230];
+      const gray   = [180, 170, 155];
+      const red    = [220, 100, 100];
+      const bg     = [14, 12, 8];
+      const dark   = [25, 22, 15];
+      const divider= [50, 45, 35];
+
+      // ── Background ──────────────────────────────
+      doc.setFillColor(...bg);
+      doc.rect(0, 0, 210, 297, 'F');
+
+      // ── Header bar ──────────────────────────────
+      doc.setFillColor(...dark);
+      doc.rect(0, 0, 210, 30, 'F');
+
+      // Gold border under header
+      doc.setDrawColor(...gold);
+      doc.setLineWidth(0.6);
+      doc.line(15, 30, 195, 30);
+
+      // Logo text
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.setTextColor(...gold);
+      doc.text('VAKIL', 15, 20);
+      doc.setTextColor(...white);
+      doc.text('AI', 40, 20);
+
+      // Tagline
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(...gray);
+      doc.text('AI-Powered Legal Document Analysis  |  vakilai-henna.vercel.app', 15, 26);
+
+      // Date top right
+      const now = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      doc.setFontSize(7);
+      doc.setTextColor(...gray);
+      doc.text(`Generated: ${now}`, 195, 26, { align: 'right' });
+
+      // ── Document info ────────────────────────────
+      const docType = document.getElementById('resultDocType').textContent || 'LEGAL DOCUMENT';
+      const docName = document.getElementById('resultDocName').textContent || 'Document';
+      const lang    = document.getElementById('resultLangBadge').textContent || 'English';
+
+      // Doc type badge
+      doc.setFillColor(...gold);
+      doc.roundedRect(15, 35, 65, 8, 1.5, 1.5, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(...bg);
+      doc.text(docType, 47.5, 40, { align: 'center' });
+
+      // Language badge
+      doc.setFillColor(40, 35, 20);
+      doc.setDrawColor(...gold);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(83, 35, 35, 8, 1.5, 1.5, 'FD');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(...gold);
+      doc.text(lang.toUpperCase(), 100.5, 40, { align: 'center' });
+
+      // Document name
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(...white);
+      const nameLines = doc.splitTextToSize(docName, 180);
+      doc.text(nameLines, 15, 53);
+
+      let y = 53 + (nameLines.length * 7) + 4;
+
+      // Gold separator
+      doc.setDrawColor(...gold);
+      doc.setLineWidth(0.4);
+      doc.line(15, y, 195, y);
+      y += 8;
+
+      const pageH   = 282;
+      const margin  = 15;
+      const contentW = 178;
+
+      function newPage() {
+        doc.addPage();
+        doc.setFillColor(...bg);
+        doc.rect(0, 0, 210, 297, 'F');
+        // Mini header on new page
+        doc.setFillColor(...dark);
+        doc.rect(0, 0, 210, 12, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(...gold);
+        doc.text('VAKILAI', 15, 8);
+        doc.setTextColor(...gray);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.text(docName, 195, 8, { align: 'right' });
+        y = 20;
+      }
+
+      function checkPage(needed = 12) {
+        if (y + needed > pageH) newPage();
+      }
+
+      function sectionLabel(title, isRed = false) {
+        checkPage(14);
+        // Label line
+        doc.setFillColor(...(isRed ? red : gold));
+        doc.rect(margin, y - 3, 3, 6, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(...(isRed ? red : gold));
+        doc.text(title, margin + 6, y + 1);
+        y += 7;
+        // Divider
+        doc.setDrawColor(...divider);
+        doc.setLineWidth(0.25);
+        doc.line(margin, y, 195, y);
+        y += 5;
+      }
+
+      function drawText(text, color = white, size = 9) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(size);
+        doc.setTextColor(...color);
+        const lines = doc.splitTextToSize(text, contentW);
+        lines.forEach(line => {
+          checkPage(6);
+          doc.text(line, margin, y);
+          y += 5.2;
+        });
+        y += 3;
+      }
+
+      function drawBullets(items, color = white, isRed = false) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        items.forEach(item => {
+          const clean = item.replace(/^[⚠️🚨✅📅💰⏰•·\-\*]+\s*/u, '');
+          const lines = doc.splitTextToSize(clean, contentW - 7);
+          checkPage(lines.length * 5.2 + 3);
+          // Bullet dot
+          doc.setFillColor(...(isRed ? red : gold));
+          doc.circle(margin + 1.5, y - 1.5, 0.9, 'F');
+          doc.setTextColor(...(isRed ? red : color));
+          lines.forEach((line, i) => {
+            doc.text(line, margin + 5, y);
+            y += 5.2;
+          });
+          y += 1.5;
+        });
+        y += 2;
+      }
+
+      // ── SUMMARY ─────────────────────────────────
+      sectionLabel('WHAT IS THIS DOCUMENT?');
+      const summary = document.getElementById('resSummary').textContent || '';
+      drawText(summary, white);
+
+      // ── OBLIGATIONS ─────────────────────────────
+      sectionLabel('YOUR OBLIGATIONS');
+      const oblEl = document.getElementById('resObligations');
+      const oblItems = Array.from(oblEl.querySelectorAll('li')).map(li => li.textContent.trim());
+      if (oblItems.length > 0) drawBullets(oblItems, white);
+
+      // ── KEY DATES & AMOUNTS ──────────────────────
+      sectionLabel('KEY DATES & AMOUNTS');
+      const datesEl = document.getElementById('resDates');
+      const dateItems = Array.from(datesEl.querySelectorAll('li')).map(li => li.textContent.trim());
+      if (dateItems.length > 0) drawBullets(dateItems, [180, 210, 180]);
+
+      // ── RED FLAGS ────────────────────────────────
+      sectionLabel('⚠ RED FLAGS', true);
+      const flagsEl = document.getElementById('resFlags');
+      const flagItems = Array.from(flagsEl.querySelectorAll('li')).map(li => li.textContent.trim());
+      if (flagItems.length > 0) drawBullets(flagItems, red, true);
+
+      // ── NEXT STEPS ───────────────────────────────
+      sectionLabel('WHAT TO DO NEXT');
+      const nextSteps = document.getElementById('resNext').textContent || '';
+      drawText(nextSteps, [180, 210, 180]);
+
+      // ── Footer ───────────────────────────────────
+      checkPage(20);
+      y = pageH + 5;
+      doc.setDrawColor(...gold);
+      doc.setLineWidth(0.3);
+      doc.line(15, 285, 195, 285);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...gray);
+      doc.text('Generated by VakilAI  |  vakilai-henna.vercel.app  |  This is an AI-generated summary for informational purposes only.', 105, 291, { align: 'center' });
+      doc.text('Not legal advice. Consult a qualified lawyer before making any legal decisions.', 105, 295, { align: 'center' });
+
+      // Page numbers
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6.5);
+        doc.setTextColor(...gray);
+        doc.text(`Page ${i} of ${totalPages}`, 195, 291, { align: 'right' });
+      }
+
+      // Save
+      const filename = (docName.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'vakilai_analysis') + '_analysis.pdf';
+      doc.save(filename);
+
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      alert('Could not generate PDF. Please try again.');
+    }
   }
 
   function resetUpload() {
